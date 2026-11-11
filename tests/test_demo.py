@@ -35,9 +35,11 @@ class DemoTests(unittest.TestCase):
         js = (assets / "dashboard.js").read_text(encoding="utf-8")
         charts = (assets / "charts.js").read_text(encoding="utf-8")
         self.assertIn('id="track-filters"', html)
-        self.assertIn("Object.entries(data.tracks)", js)
+        self.assertIn('class="modelbar"', html)
+        self.assertIn('class="worker-strip"', html)
+        self.assertIn("Object.entries(state.board.tracks", js)
         self.assertIn("track.direction", charts)
-        self.assertIn("America/Los_Angeles", html)
+        self.assertIn("PDT = UTC−7", html)
 
 
 if __name__ == "__main__":

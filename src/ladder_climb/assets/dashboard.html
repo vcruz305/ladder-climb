@@ -1,53 +1,38 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Multi-model Ladder Climb telemetry, archives, and adversarial review">
-  <title>Ladder Climb · Workspace</title><link rel="stylesheet" href="/assets/dashboard.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Multi-model Ladder Climb telemetry, archives, and adversarial review">
+<title>Ladder Climb · Workspace</title>
+<link rel="stylesheet" href="/assets/dashboard.css">
 </head>
-<body>
+<body data-layout="unified" data-view="live">
 <a class="skip" href="#content">Skip to content</a>
 <main>
-  <header class="hero"><div><p class="eyebrow">Parallel ladder-climb / engineering telemetry</p>
-    <h1 id="title">Ladder Climb</h1><p class="subtitle" id="subtitle">Connecting to workspace…</p></div>
-    <div class="live" role="status"><span class="heartbeat" id="heartbeat"></span><span id="live-label">LIVE · SERIAL POLL</span>
-      <span aria-hidden="true">·</span><time id="updated">CONNECTING</time><span id="skew" class="skew" hidden>CLOCK SKEW</span></div>
-  </header>
-  <nav id="model-tabs" class="model-tabs" role="tablist" aria-label="Workspace views"></nav>
-  <nav id="sub-tabs" class="sub-tabs" role="tablist" aria-label="Model views" hidden>
-    <button role="tab" data-subview="live" aria-selected="true">Live Climb</button>
-    <button role="tab" data-subview="history" aria-selected="false">Model History</button>
-  </nav>
-  <div id="content">
-    <section id="overview" class="overview" hidden aria-label="Model overview"></section>
-    <section id="live-view" hidden>
-      <section class="workers" id="workers" aria-label="Active climbers"></section>
-      <nav class="controls" aria-label="Dashboard filters"><div class="control-group track-filters" id="track-filters"><span class="control-label">Track</span></div>
-        <div class="control-spacer"></div><div class="control-group"><label class="control-label" for="timezone">Timezone</label>
-          <select id="timezone"><option value="America/Los_Angeles">PT · Los Angeles</option><option value="local">Local</option><option value="UTC">UTC</option></select></div>
-        <div class="control-group status-filters"><span class="control-label">Show</span><button data-status="all" aria-pressed="true">All</button>
-          <button data-status="kept">Kept</button><button data-status="rejected">Rejected</button><button data-status="testing">Testing</button><button data-status="interrupted">Interrupted</button></div></nav>
-      <section class="track-grid" id="tracks"></section>
-      <section class="panel activity" id="activity"><div class="panel-head"><div><p class="eyebrow">Unified ledger</p><h2>Activity · newest first</h2></div><span class="muted mono" id="activity-count"></span></div>
-        <div class="table-wrap"><table><thead><tr><th>Track</th><th>Rung / commit</th><th>Experiment / evidence</th><th>Result</th><th>Δ champion</th><th>Updated</th><th>Duration</th><th>Gate</th><th>Review</th><th>Status</th></tr></thead>
-          <tbody id="activity-rows"><tr><td colspan="10" class="empty">Loading rungs…</td></tr></tbody></table></div></section>
-    </section>
-    <section id="model-history" hidden><div id="model-history-summary" class="sticky-summary"></div>
-      <div class="controls"><label>Campaign <select id="campaign-select"></select></label><div id="model-track-filters" class="control-group"></div></div>
-      <section id="frontier-chart" class="panel"></section><div id="model-history-rows"></div></section>
-    <section id="global-history" hidden><div class="panel-head"><div><p class="eyebrow">Cross-model ledger</p><h2>History</h2></div>
-      <div><button id="export-json">Export JSON</button><button id="export-csv">Export CSV</button></div></div>
-      <form id="history-filters" class="history-filters"><input name="search" type="search" placeholder="Search rungs, commits, metrics…">
-        <select name="model" aria-label="Model"><option value="">All models</option></select><input name="campaign" placeholder="Campaign">
-        <input name="track" placeholder="Track"><select name="status"><option value="">Any status</option><option>kept</option><option>rejected</option><option>testing</option><option>interrupted</option></select>
-        <select name="gate"><option value="">Any gate</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="pending">Pending</option></select>
-        <select name="review"><option value="">Any review</option><option>verified</option><option>flagged</option><option>pending</option></select>
-        <select name="sort"><option value="newest">Newest</option><option value="chronological">Chronological</option></select><button type="submit">Apply</button></form>
-      <div id="history-status" class="muted"></div><div class="table-wrap"><table><thead><tr><th>Model / campaign</th><th>Track / rung</th><th>Summary</th><th>Value</th><th>Δ champion</th><th>Timing</th><th>Gate</th><th>Review</th><th>Status</th></tr></thead>
-        <tbody id="history-rows"></tbody></table></div><button id="history-more" hidden>Load more</button></section>
-  </div>
-  <footer><span id="totals">ATOMIC WORKSPACE API</span><span>ZERO TELEMETRY · LOCAL-FIRST</span></footer>
+<header class="topbar"><div><p class="eyebrow">Parallel ladder-climb / engineering telemetry</p><h1><span id="model">Ladder Climb</span> <span class="hardware">· <span id="hardware">Workspace</span></span></h1></div><div class="live" role="status"><span id="heartbeat" class="heartbeat"></span><span id="live-label">LIVE · 2S POLL</span><span>·</span><time id="updated">CONNECTING</time><span id="skew" class="skew" hidden>CLOCK SKEW</span></div></header>
+<nav class="modelbar" aria-label="Workspace models and history views"><div class="control-group model-tabs" id="model-tabs" role="tablist" aria-label="Models"></div><div class="control-spacer"></div><div class="control-group view-modes" role="tablist" aria-label="History views"><button class="seg" data-view="live" role="tab" aria-selected="true">Live Ladder</button><button class="seg" data-view="history" role="tab" aria-selected="false">Model History</button><button class="seg" data-view="global" role="tab" aria-selected="false">All History</button></div></nav>
+<div id="content">
+<section id="overview" class="overview" hidden aria-label="Model overview"></section>
+<section id="live-view">
+<section class="worker-strip" id="workers" aria-label="Live worker status"></section>
+<nav class="controlbar" aria-label="Dashboard views and filters"><div class="control-group layout-modes"><span class="control-label">Layout</span><button class="seg" data-layout-mode="unified" aria-pressed="true">Unified</button><button class="seg" data-layout-mode="split" aria-pressed="false">Split</button><button class="seg" data-layout-mode="stacked" aria-pressed="false">Stacked</button><span id="layout-track-buttons" class="control-group"></span></div><div class="control-spacer"></div><div class="control-group track-tabs" id="track-filters"></div><div class="control-group status-filters"><span class="control-label">Show</span><button class="pill" data-status-filter="all" aria-pressed="true">All</button><button class="pill" data-status-filter="kept" aria-pressed="false">Kept Winners</button><button class="pill" data-status-filter="rejected" aria-pressed="false">Rejected</button></div></nav>
+<section class="charts" id="charts" aria-label="Rising ladder charts"></section>
+<section class="ledger" id="ledger" aria-label="Experiment ledger"></section>
+</section>
+<section id="model-history" hidden>
+<nav class="controlbar history-controls" aria-label="Model history filters"><div class="control-group"><label class="control-label" for="campaign-select">Campaign / Archive</label><select class="pill" id="campaign-select"><option value="active">Active Campaign</option></select></div><div class="control-group" id="model-track-filters"></div><div class="control-spacer"></div><div class="control-group"><span class="control-label">Review</span><button class="pill" data-review-filter="all" aria-pressed="true">All</button><button class="pill" data-review-filter="verified" aria-pressed="false">Verified</button><button class="pill" data-review-filter="flagged" aria-pressed="false">Flagged</button><button class="pill" data-review-filter="pending" aria-pressed="false">Pending</button></div><div class="control-group"><button class="pill" id="history-order" data-order="newest" aria-pressed="true">Newest First</button></div></nav>
+<div id="model-history-summary" class="sticky-summary"></div><section id="frontier-chart" class="charts history-charts" aria-label="Historical frontier charts"></section>
+<article class="panel table-panel"><div class="panel-head ledger-head"><div><h3>MODEL HISTORY · FULL CAMPAIGN RECORD</h3><p class="ledger-hint">Wave, session, gate, and review metadata · click any row</p></div><div class="ledger-meta" id="model-history-count"></div></div><div class="table-scroll"><table><thead><tr><th>Track / rung</th><th>Experiment / wave</th><th class="num">Result</th><th class="num">Δ step</th><th>Updated (PDT)</th><th>Gate</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="model-history-rows"></tbody></table></div></article>
+</section>
+<section id="global-history" hidden>
+<nav class="controlbar history-controls" aria-label="Global history filters"><div class="control-group"><input id="history-search" class="history-search" name="search" type="search" placeholder="Search rungs, commits, metrics…" aria-label="Search history"></div><div class="control-group" id="history-model-filters"></div><div class="control-group"><select class="pill" id="history-status-filter" aria-label="Status"><option value="">Any status</option><option value="kept">Kept</option><option value="rejected">Rejected</option><option value="testing">Testing</option><option value="interrupted">Interrupted</option></select><select class="pill" id="history-review-filter" aria-label="Review"><option value="">Any review</option><option value="verified">Verified</option><option value="flagged">Flagged</option><option value="pending">Pending</option></select></div><div class="control-spacer"></div><div class="control-group"><button class="pill" id="export-json">Export JSON</button><button class="pill" id="export-csv">Export CSV</button></div></nav>
+<article class="panel table-panel"><div class="panel-head ledger-head"><div><h3>ALL HISTORY · CROSS-MODEL LEDGER</h3><p class="ledger-hint" id="history-status">Loading history…</p></div><div class="ledger-meta">NEWEST FIRST</div></div><div class="table-scroll"><table><thead><tr><th>Model / campaign</th><th>Track / rung</th><th>Experiment / evidence</th><th class="num">Result</th><th class="num">Δ step</th><th>Updated</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="history-rows"></tbody></table></div></article><button class="pill history-more" id="history-more" hidden>Load more</button>
+</section>
+</div>
+<footer class="foot"><span id="totals">VERIFIED RUNGS · KEPT / TESTING / REJECTED</span><span>RELATIVE FEED /ladder.json · PDT = UTC−7</span></footer>
 </main>
 <noscript>JavaScript is required. Raw feeds remain at <a href="/ladder.json">/ladder.json</a>.</noscript>
 <script src="/assets/charts.js"></script><script src="/assets/history.js"></script><script src="/assets/dashboard.js"></script>
-</body></html>
+</body>
+</html>
