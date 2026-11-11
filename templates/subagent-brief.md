@@ -1,4 +1,4 @@
-# Parallel Hill-Climb Worker Brief
+# Parallel Ladder-Climb Worker Brief
 
 Copy this brief into a worker task and fill every placeholder. One worker owns one hypothesis at a time.
 

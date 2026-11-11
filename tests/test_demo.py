@@ -22,6 +22,12 @@ class DemoTests(unittest.TestCase):
             self.assertEqual(sum(r["status"] == "testing" for t in board["tracks"].values() for r in t["rungs"]), 3)
             self.assertLess(champion(board["tracks"]["latency"])[0], board["tracks"]["latency"]["baseline"])
             self.assertGreater(champion(board["tracks"]["prefill"])[0], board["tracks"]["prefill"]["baseline"])
+            from ladder_climb.store import list_campaigns, list_models
+            self.assertEqual({m["id"] for m in list_models(directory)}, {"atlas", "mosaic", "archivist"})
+            campaigns = list_campaigns(directory, "archivist")
+            self.assertTrue(any(c["campaign_id"] == "wave-1" and not c["active"] for c in campaigns))
+            self.assertEqual(board["tracks"]["prefill"]["rungs"][5]["review"], "verified")
+            self.assertEqual(board["tracks"]["decode"]["rungs"][4]["review"], "flagged")
 
     def test_dashboard_has_no_campaign_specific_track_names(self) -> None:
         assets = Path(__file__).resolve().parents[1] / "src" / "ladder_climb" / "assets"

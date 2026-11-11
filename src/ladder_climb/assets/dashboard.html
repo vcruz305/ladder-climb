@@ -1,76 +1,53 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Live multi-agent optimization campaign leaderboard">
-  <title>Ladder Climb · Live Campaign</title>
-  <link rel="stylesheet" href="/assets/dashboard.css">
-  <script>if(window===window.top)document.documentElement.classList.add('standalone')</script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Multi-model Ladder Climb telemetry, archives, and adversarial review">
+  <title>Ladder Climb · Workspace</title><link rel="stylesheet" href="/assets/dashboard.css">
 </head>
 <body>
-<a class="skip" href="#activity">Skip to activity</a>
+<a class="skip" href="#content">Skip to content</a>
 <main>
-  <header class="hero">
-    <div>
-      <p class="eyebrow">Parallel hill-climb / agent telemetry</p>
-      <h1 id="title">Ladder Climb</h1>
-      <p class="subtitle" id="subtitle">Connecting to campaign feed…</p>
-    </div>
-    <div class="live" role="status">
-      <span class="heartbeat" id="heartbeat"></span>
-      <span id="live-label">LIVE · 2S POLL</span>
-      <span aria-hidden="true">·</span><time id="updated">CONNECTING</time>
-    </div>
+  <header class="hero"><div><p class="eyebrow">Parallel ladder-climb / engineering telemetry</p>
+    <h1 id="title">Ladder Climb</h1><p class="subtitle" id="subtitle">Connecting to workspace…</p></div>
+    <div class="live" role="status"><span class="heartbeat" id="heartbeat"></span><span id="live-label">LIVE · SERIAL POLL</span>
+      <span aria-hidden="true">·</span><time id="updated">CONNECTING</time><span id="skew" class="skew" hidden>CLOCK SKEW</span></div>
   </header>
-
-  <section class="workers" id="workers" aria-label="Active climbers"></section>
-
-  <nav class="controls" aria-label="Dashboard filters">
-    <div class="control-group track-filters" id="track-filters">
-      <span class="control-label">Track</span>
-    </div>
-    <div class="control-spacer"></div>
-    <div class="control-group">
-      <label class="control-label" for="timezone">Timezone</label>
-      <select id="timezone">
-        <option value="America/Los_Angeles">PT · Los Angeles</option>
-        <option value="local">Local</option>
-        <option value="UTC">UTC</option>
-      </select>
-    </div>
-    <div class="control-group status-filters" aria-label="Status filter">
-      <span class="control-label">Show</span>
-      <button data-status="all" aria-pressed="true">All</button>
-      <button data-status="kept" aria-pressed="false">Kept</button>
-      <button data-status="rejected" aria-pressed="false">Rejected</button>
-      <button data-status="testing" aria-pressed="false">Testing</button>
-    </div>
+  <nav id="model-tabs" class="model-tabs" role="tablist" aria-label="Workspace views"></nav>
+  <nav id="sub-tabs" class="sub-tabs" role="tablist" aria-label="Model views" hidden>
+    <button role="tab" data-subview="live" aria-selected="true">Live Climb</button>
+    <button role="tab" data-subview="history" aria-selected="false">Model History</button>
   </nav>
-
-  <section class="track-grid" id="tracks" aria-label="Track scorecards and trajectories"></section>
-
-  <section class="panel activity" id="activity" aria-label="Unified experiment activity">
-    <div class="panel-head">
-      <div><p class="eyebrow">Unified ledger</p><h2>Activity · newest first</h2></div>
-      <span class="muted mono" id="activity-count"></span>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Track</th><th>Rung / commit</th><th>Experiment / evidence</th>
-          <th class="num">Result</th><th class="num">Δ champion</th><th>Updated</th>
-          <th>Duration</th><th>Gate</th><th>Status</th>
-        </tr></thead>
-        <tbody id="activity-rows"><tr><td colspan="9" class="empty">Loading rungs…</td></tr></tbody>
-      </table>
-    </div>
-  </section>
-
-  <footer><span id="totals">ATOMIC FEED /ladder.json</span><span>ZERO TELEMETRY · LOCAL-FIRST</span></footer>
+  <div id="content">
+    <section id="overview" class="overview" hidden aria-label="Model overview"></section>
+    <section id="live-view" hidden>
+      <section class="workers" id="workers" aria-label="Active climbers"></section>
+      <nav class="controls" aria-label="Dashboard filters"><div class="control-group track-filters" id="track-filters"><span class="control-label">Track</span></div>
+        <div class="control-spacer"></div><div class="control-group"><label class="control-label" for="timezone">Timezone</label>
+          <select id="timezone"><option value="America/Los_Angeles">PT · Los Angeles</option><option value="local">Local</option><option value="UTC">UTC</option></select></div>
+        <div class="control-group status-filters"><span class="control-label">Show</span><button data-status="all" aria-pressed="true">All</button>
+          <button data-status="kept">Kept</button><button data-status="rejected">Rejected</button><button data-status="testing">Testing</button><button data-status="interrupted">Interrupted</button></div></nav>
+      <section class="track-grid" id="tracks"></section>
+      <section class="panel activity" id="activity"><div class="panel-head"><div><p class="eyebrow">Unified ledger</p><h2>Activity · newest first</h2></div><span class="muted mono" id="activity-count"></span></div>
+        <div class="table-wrap"><table><thead><tr><th>Track</th><th>Rung / commit</th><th>Experiment / evidence</th><th>Result</th><th>Δ champion</th><th>Updated</th><th>Duration</th><th>Gate</th><th>Review</th><th>Status</th></tr></thead>
+          <tbody id="activity-rows"><tr><td colspan="10" class="empty">Loading rungs…</td></tr></tbody></table></div></section>
+    </section>
+    <section id="model-history" hidden><div id="model-history-summary" class="sticky-summary"></div>
+      <div class="controls"><label>Campaign <select id="campaign-select"></select></label><div id="model-track-filters" class="control-group"></div></div>
+      <section id="frontier-chart" class="panel"></section><div id="model-history-rows"></div></section>
+    <section id="global-history" hidden><div class="panel-head"><div><p class="eyebrow">Cross-model ledger</p><h2>History</h2></div>
+      <div><button id="export-json">Export JSON</button><button id="export-csv">Export CSV</button></div></div>
+      <form id="history-filters" class="history-filters"><input name="search" type="search" placeholder="Search rungs, commits, metrics…">
+        <select name="model" aria-label="Model"><option value="">All models</option></select><input name="campaign" placeholder="Campaign">
+        <input name="track" placeholder="Track"><select name="status"><option value="">Any status</option><option>kept</option><option>rejected</option><option>testing</option><option>interrupted</option></select>
+        <select name="gate"><option value="">Any gate</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="pending">Pending</option></select>
+        <select name="review"><option value="">Any review</option><option>verified</option><option>flagged</option><option>pending</option></select>
+        <select name="sort"><option value="newest">Newest</option><option value="chronological">Chronological</option></select><button type="submit">Apply</button></form>
+      <div id="history-status" class="muted"></div><div class="table-wrap"><table><thead><tr><th>Model / campaign</th><th>Track / rung</th><th>Summary</th><th>Value</th><th>Δ champion</th><th>Timing</th><th>Gate</th><th>Review</th><th>Status</th></tr></thead>
+        <tbody id="history-rows"></tbody></table></div><button id="history-more" hidden>Load more</button></section>
+  </div>
+  <footer><span id="totals">ATOMIC WORKSPACE API</span><span>ZERO TELEMETRY · LOCAL-FIRST</span></footer>
 </main>
-<noscript>This dashboard needs JavaScript. The raw feed remains available at <a href="/ladder.json">/ladder.json</a>.</noscript>
-<script src="/assets/charts.js"></script>
-<script src="/assets/dashboard.js"></script>
-</body>
-</html>
+<noscript>JavaScript is required. Raw feeds remain at <a href="/ladder.json">/ladder.json</a>.</noscript>
+<script src="/assets/charts.js"></script><script src="/assets/history.js"></script><script src="/assets/dashboard.js"></script>
+</body></html>

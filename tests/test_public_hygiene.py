@@ -17,6 +17,7 @@ FORBIDDEN = (
     "cruz" + "spark",
     "darks" + "mac",
     "sage-" + "rexl3",
+    "hill" + " climb", "hill-" + "climb", "hill" + "climb",
 )
 
 
@@ -32,7 +33,9 @@ def violations(text: str) -> list[str]:
 
 class PublicHygieneTests(unittest.TestCase):
     def test_every_tracked_path_and_file_is_public_safe(self) -> None:
-        tracked = [Path(p) for p in git("ls-files", "-z").stdout.split("\0") if p]
+        tracked = [Path(p) for p in git("ls-files", "--cached", "--others", "--exclude-standard", "-z").stdout.split("\0") if p]
+        tracked.extend(p.relative_to(ROOT) for p in (ROOT / ".hermes").rglob("*") if p.is_file())
+        tracked = sorted(set(tracked))
         self.assertTrue(tracked, "expected a Git-tracked source tree")
         failures: list[str] = []
         for relative in tracked:

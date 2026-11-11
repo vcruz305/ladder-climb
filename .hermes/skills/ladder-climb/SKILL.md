@@ -1,73 +1,81 @@
 ---
 name: ladder-climb
-description: Use when hill-climbing benchmarks with parallel agents. Maintain an atomic live leaderboard.
+description: Use when ladder-climbing benchmarks with parallel agents. Maintain independent atomic model ledgers, history, and review.
 ---
 
 # Ladder Climb
 
-Run measurable optimization campaigns with a shared, lock-protected ledger. This skill works for autonomous orchestrators and isolated benchmark workers.
+Run measurable optimization campaigns with corruption-resistant ledgers. Read the repository `AGENTS.md` for the full operator contract.
 
-## Start a campaign
+## Initialize and serve
 
-When asked to hill-climb an objective or run a live optimization campaign:
-
-1. Confirm objectives, correctness criteria, baselines, and units. Use a separate track per objective and `lower` for latency, size, cost, or error.
-2. Initialize and validate the board:
+Confirm objectives, correctness criteria, baselines, directions, and units. Plain directories remain legacy single boards. For simultaneous models, initialize each independently:
 
 ```sh
-ladder init --dir BOARD --title TITLE --subtitle SUBTITLE \
+ladder init --dir BOARD --model MODEL_ID --model-name DISPLAY_NAME \
+  --title TITLE --hardware HARDWARE \
   --track 'speed:Kernel Speed:tok/s:100:500:higher' \
   --track 'latency:Request Latency:ms:80:30:lower'
-ladder validate --dir BOARD
+ladder validate --dir BOARD --model MODEL_ID
+ladder models list --dir BOARD --json
 ```
 
-3. Start `ladder serve --dir BOARD --host 0.0.0.0 --port 18999` and give the user the dashboard URL.
-4. Read existing kept and rejected rungs before choosing a hypothesis. Never repeat a documented dead end.
-5. Give parallel workers isolated worktrees, unique rung prefixes, and explicit exclusive-resource reservations. All workers share BOARD.
+Start `ladder serve --dir BOARD`. Binding defaults to localhost. Only use `--host 0.0.0.0 --cors` on an explicitly trusted network; consider `--token` for shared access.
 
-Preview the UI with `ladder demo --dir DEMO_DIR --serve`.
+Each model uses `models/MODEL_ID/ladder.lock`; different models never share a mutation lock. Never reinterpret an existing legacy directory as a workspace implicitly.
 
 ## Required worker loop
 
-Log the attempt **before** benchmarking:
+Read prior kept and rejected rungs first. Claim a unique ID atomically rather than predicting one:
 
 ```sh
-ladder rung --dir BOARD --track speed --id SPEED-017 \
-  --status testing --value 0 --commit COMMIT --gate pending \
-  --summary 'Hypothesis and configuration' --metric warmup=3
+ladder claim --dir BOARD --model MODEL_ID --track speed --prefix SPEED \
+  --wave wave-2 --session SESSION --agent AGENT --json
 ```
 
-Use A → B → A paired measurements when noise can affect the result. Keep inputs and benchmark conditions comparable. Run correctness checks before promotion and record numeric evidence in `--metric` flags.
+The claim creates `testing` before benchmarking. If using explicit IDs, create with `ladder rung ... --status testing --value 0 --gate pending`. Use A → B → A paired measurements when noise can affect results and run correctness checks before promotion.
 
-Keep a winner only after preserving its exact source:
+Finish the same ID with `kept`, `rejected`, or `interrupted`:
 
 ```sh
-ladder rung --dir BOARD --track speed --id SPEED-017 \
-  --status kept --value 184.2 --gate pass \
-  --summary 'Hypothesis and measured evidence' --metric output_delta=0.0001
+ladder rung --dir BOARD --model MODEL_ID --track speed --id SPEED-001 \
+  --status kept --value 184.2 --gate pass --metric output_delta=0.0001
+ladder rung --dir BOARD --model MODEL_ID --track speed --id SPEED-002 \
+  --status interrupted --reason 'Worker crashed before measurement'
 ```
 
-Revert a loser from integration but preserve its ledger entry:
+Never invent a value to close a crashed attempt. Terminal `ended_at` and `duration_s` are preserved. Negative clock skew is flagged rather than clamped to a fictitious zero.
+
+Duplicate testing claims and accidental terminal overwrites fail. Explicit updates require the current board `--expected-revision N`; on conflict, reload and reconcile instead of retrying blindly. `--force-update` is only for deliberate repair. All lock waits have bounded `--lock-timeout` (default 10 seconds).
+
+## Independent adversarial review
+
+Gate evidence and review verdict are separate. A correctness pass is not automatically an adversarial verification:
 
 ```sh
-ladder rung --dir BOARD --track speed --id SPEED-018 \
-  --status rejected --value 91.7 --gate pass \
-  --summary 'Why the hypothesis failed'
+ladder review --dir BOARD --model MODEL_ID --track speed --id SPEED-001 \
+  --review verified --reviewer REVIEWER --notes 'Evidence checked' --expected-revision N
 ```
 
-Completion computes `duration_s` from `started_at` unless `--duration-s` is given. `--parity` aliases `--gate`. An interrupted attempt must stay truthful; never invent measurements.
+Use `pending`, `verified`, or `flagged`. Review must never silently change kept/rejected status. Record concrete review notes and preserve gate evidence.
 
-## Locking and integration invariants
+## Archives and history
 
-- Never edit `ladder.json` directly; every mutation goes through `ladder rung`.
-- The CLI holds `fcntl.flock` across the full read-modify-write transaction and uses `os.replace` to publish complete JSON.
-- Do not delete `ladder.lock` during a campaign. Use a local filesystem with reliable locks.
-- Use at most one benchmark worker per contended exclusive device. Reviews and non-benchmark tasks can run independently.
-- Rebase workers after integrating a winner and rerun gates when integration changes the result.
-- A kept rung must pass its gate and cannot regress the existing champion.
+Snapshot completed waves into immutable per-model archives:
 
-## Monitor and finish
+```sh
+ladder archive --dir BOARD --model MODEL_ID --campaign wave-1 --title 'Wave 1'
+ladder campaigns list --dir BOARD --model MODEL_ID --json
+ladder history --dir BOARD --model MODEL_ID --review verified --json
+ladder export --dir BOARD --format csv --output history.csv
+```
 
-Use `ladder status --dir BOARD` to inspect champions and active attempts; `--json` provides the full feed. Do not trust terminal output without checking the board.
+Use `--start-next` only when intentionally starting an empty successor campaign. Never mutate archived `ladder.json` files. Global history supports search, model/campaign/track/status/gate/review/session/wave filters, chronological replay, pagination, and JSON/CSV export.
 
-At completion, resolve or explain every `testing` rung, run `ladder validate --dir BOARD`, and report each champion, unit, gain, winning commit, gate evidence, kept/rejected counts, and remaining limitations. Preserve inconclusive and failed attempts as search-space knowledge.
+## Safety invariants
+
+- Never edit `ladder.json` directly; use locked store/CLI mutations and atomic replacement.
+- Do not delete lock files during campaigns. Use filesystems with reliable `fcntl.flock` semantics.
+- Isolate coding workers and explicitly reserve contended benchmark hardware. Model board locks do not replace hardware locks.
+- Keep units, directions, and benchmark regimes separate across models; do not declare global champions from incomparable tracks.
+- Resolve or explain every testing rung, validate each model, and report champion values/units, commits, gains, gates, review verdicts, and remaining limitations.
