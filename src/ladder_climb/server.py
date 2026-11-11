@@ -7,7 +7,7 @@ from importlib.resources import files
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 from .history import export_history, history_payload
-from .schema import ValidationError, champion, load_board, utc_now
+from .schema import ValidationError, champion, load_board, normalize_board, utc_now
 from .store import list_campaigns, list_models, paths_for
 ASSETS = files("ladder_climb").joinpath("assets")
 CONTENT_TYPES = {".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8"}
@@ -44,7 +44,7 @@ class Handler(BaseHTTPRequestHandler):
         if route == "/ladder.json":
             path = paths_for(self.root, self.model, self.campaign).feed
             if (self.root / "ladder.json").is_file() and not self.model and not self.campaign:
-                raw = json.loads(path.read_text(encoding="utf-8")); raw["now"] = utc_now(); return _json_bytes(raw)
+                raw = json.loads(path.read_text(encoding="utf-8")); return _json_bytes(dict(normalize_board(raw), now=utc_now()))
             return _json_bytes(dict(self._selected_board(), now=utc_now()))
         if route == "/api/health":
             board = self._selected_board()
