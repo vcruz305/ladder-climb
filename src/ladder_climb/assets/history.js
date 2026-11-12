@@ -17,13 +17,13 @@ function globalRow(row,index){
  tr.append(cell('track-cell','Model',row.model+' / '+row.campaign),cell('rung-cell','Rung',row.track+' / '+row.rung));
  const summary=el('div');summary.append(el('span',row.title||row.summary||'','experiment'),el('span',(row.commit||'working')+' · '+(row.wave||'—')+' · '+(row.session||'—'),'secondary'));
  const metric=el('div');metric.append(el('span',fmt(row.value),'metric-value'),el('span',row.unit,'metric-regime'));
- tr.append(cell('experiment-cell','Experiment',summary),cell('metric-cell','Result',metric),cell('delta-cell num','Δ prior best',deltaNode(row.delta_abs,row.delta_pct)),cell('updated-cell','Updated',UI().pdt(row.updated_at||row.ended_at)),cell('review-cell','Review',badge(row.review)),cell('status-cell','Status',el('span',row.status,'status '+row.status)),cell('open-cell num','',el('span','›','chevron')));
+ tr.append(cell('experiment-cell','Experiment',summary),cell('metric-cell num','Result',metric),cell('delta-cell num','Δ prior best',deltaNode(row.delta_abs,row.delta_pct)),cell('updated-cell','Updated',UI().pdt(row.updated_at||row.ended_at)),cell('review-cell','Review',badge(row.review)),cell('status-cell','Status',el('span',row.status,'status '+row.status)),cell('open-cell num','',el('span','›','chevron')));
  expandable(tr,row,9);return tr;
 }
 function query(extra={}){return new URLSearchParams({...filters,...extra}).toString()}
 async function load(append=false){
  if(loading)return;loading=true;const generation=++requestGeneration;if(controller)controller.abort();controller=new AbortController();$('history-status').textContent='Loading history…';
- try{const res=await fetch('/api/history?'+query({limit:200,offset:append?offset:0,sort:'newest'}),{cache:'no-store',signal:controller.signal});if(!res.ok)throw new Error('HTTP '+res.status);const data=await res.json();if(generation!==requestGeneration)return;total=data.total;offset=data.offset+data.rows.length;if(!append)$('history-rows').replaceChildren();data.rows.forEach((r,i)=>$('history-rows').append(globalRow(r,i)));if(!data.rows.length&&!append){const tr=el('tr'),td=el('td','No history matches these filters.','empty-row');td.colSpan=9;tr.append(td);$('history-rows').append(tr)}$('history-status').textContent=offset+' of '+total+' results · click any row for metadata';$('history-more').hidden=offset>=total}
+ try{const res=await fetch('/api/history?'+query({limit:200,offset:append?offset:0,sort:'newest'}),{cache:'no-store',signal:controller.signal});if(!res.ok)throw new Error('HTTP '+res.status);const data=await res.json();if(generation!==requestGeneration)return;$('updated').textContent=UI().pdt(data.now);total=data.total;offset=data.offset+data.rows.length;if(!append)$('history-rows').replaceChildren();data.rows.forEach((r,i)=>$('history-rows').append(globalRow(r,i)));if(!data.rows.length&&!append){const tr=el('tr'),td=el('td','No history matches these filters.','empty-row');td.colSpan=9;tr.append(td);$('history-rows').append(tr)}$('history-status').textContent=offset+' of '+total+' results · click any row for metadata';$('history-more').hidden=offset>=total}
  catch(e){if(e.name!=='AbortError')$('history-status').textContent=e.message}finally{if(generation===requestGeneration)loading=false}
 }
 function refresh(){offset=0;load()}
@@ -49,7 +49,7 @@ function historyRow(row,index){
  const summary=el('div');summary.append(el('span',row.title||row.summary||'','experiment'),el('span',UI().evidence(row),'secondary'));
  const metric=el('div');metric.append(el('span',fmt(row.value),'metric-value'),el('span',row.unit,'metric-regime'));
  const review=el('div');review.append(badge(row.review),document.createTextNode(' '),badge(row.gate));
- tr.append(cell('rung-cell','Rung / commit',rung),cell('experiment-cell','Experiment / evidence',summary),cell('metric-cell','Throughput',metric),cell('delta-cell num','Δ prior best',deltaNode(row._delta?.abs,row._delta?.pct)),cell('updated-cell','Updated',UI().pdt(row.updated_at)),cell('duration-cell','Duration',UI().rungDuration(row)),cell('review-cell','Review / gate',review),cell('status-cell','Status',el('span',row.status,'status '+row.status)),cell('open-cell num','',el('span','›','chevron')));
+ tr.append(cell('rung-cell','Rung / commit',rung),cell('experiment-cell','Experiment / evidence',summary),cell('metric-cell num','Throughput',metric),cell('delta-cell num','Δ prior best',deltaNode(row._delta?.abs,row._delta?.pct)),cell('updated-cell','Updated',UI().pdt(row.updated_at)),cell('duration-cell','Duration',UI().rungDuration(row)),cell('review-cell','Review / gate',review),cell('status-cell','Status',el('span',row.status,'status '+row.status)),cell('open-cell num','',el('span','›','chevron')));
  expandable(tr,row,11);return tr;
 }
 function renderModelFilters(entries){
@@ -74,8 +74,9 @@ async function ensureArchives(){
 function milestone(label,value){const cell=el('div',undefined,'milestone');cell.append(el('span',label,'milestone-label'),el('strong',value,'milestone-value'));return cell}
 function renderMilestones(entries){
  const rows=entries.flatMap(([,t])=>t.rungs),kept=rows.filter(r=>r.status==='kept').length,verified=rows.filter(r=>r.review==='verified').length,gates=rows.filter(r=>['pass','passed'].includes(String(r.gate||'').toLowerCase())).length,seconds=rows.reduce((n,r)=>n+Number(r.duration_s||0),0);
+ const archives=model.campaigns.filter(c=>!c.active).length,legacy=!verified&&!gates;
  const champions=entries.map(([id,t])=>{const best=C.champion(t).best;return UI().trackName(id,t)+' '+fmt(t.baseline)+' → '+fmt(best)}).join(' · ');
- const summary=$('model-history-summary');summary.replaceChildren(milestone('Baseline → best',champions),milestone('Kept / explored (hit %)',kept+' / '+rows.length+' ('+(rows.length?fmt(kept/rows.length*100):'0')+'%)'),milestone('Total climb time',UI().duration(seconds)),milestone('Verified / gate pass',verified+' / '+gates));
+ const summary=$('model-history-summary');summary.replaceChildren(milestone('Baseline → best',champions),milestone('Kept / explored (hit %)',kept+' / '+rows.length+' ('+(rows.length?fmt(kept/rows.length*100):'0')+'%)'),milestone('Total climb time',UI().duration(seconds)),milestone(legacy?'Archives & waves':'Verified / gate pass',legacy?'GATE PASS / KEPT: '+(gates||kept)+' / '+rows.length+' · '+archives+' ARCHIVES':verified+' / '+gates));
 }
 function championHeader(track,index){const c=C.champion(track),champ=el('div',undefined,'champion'),best=el('strong');best.append(document.createTextNode(fmt(c.best)),el('small',String(track.unit||'value').toUpperCase()));const gain=C.improvement(track,c.best),label=el('span',(gain===null?'—':(gain>=0?'+':'')+fmt(gain)+'%')+' VS '+fmt(track.baseline)+' '+String(track.unit||'').toUpperCase()+' BASE');champ.append(best,label);return champ}
 function renderCharts(entries){

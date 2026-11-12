@@ -41,7 +41,7 @@
   <section id="model-history-summary" class="milestone-strip" aria-label="Campaign milestones"></section>
   <section id="frontier-chart" class="charts history-charts" aria-label="Historical frontier charts"></section>
   <article class="panel table-panel"><div class="panel-head ledger-head"><div><h3>MODEL HISTORY · FULL CAMPAIGN RECORD</h3><p class="ledger-hint">Wave, gate, review, and prior-best deltas · click any row</p></div><div class="ledger-meta" id="model-history-count"></div></div>
-    <div class="table-scroll"><table><thead><tr><th>Campaign / wave</th><th>Track</th><th>Rung / commit</th><th>Experiment / evidence</th><th class="num">Throughput</th><th class="num">Δ prior best</th><th>Updated (PDT)</th><th>Duration</th><th>Review / gate</th><th>Status</th><th></th></tr></thead><tbody id="model-history-rows"></tbody></table></div>
+    <div class="table-scroll"><table><colgroup><col class="campaign-col"><col class="track-col"><col class="rung-col"><col><col class="metric-col"><col class="delta-col"><col class="updated-col"><col class="duration-col"><col class="review-col"><col class="status-col"><col class="open-col"></colgroup><thead><tr><th>Campaign / wave</th><th>Track</th><th>Rung / commit</th><th>Experiment / evidence</th><th class="num">Throughput</th><th class="num">Δ prior best</th><th>Updated (PDT)</th><th>Duration</th><th>Review / gate</th><th>Status</th><th></th></tr></thead><tbody id="model-history-rows"></tbody></table></div>
   </article>
 </section>
 <section id="global-history" hidden>
@@ -52,7 +52,7 @@
     <div class="control-group"><button class="pill" id="export-json">Export JSON</button><button class="pill" id="export-csv">Export CSV</button></div>
   </nav>
   <article class="panel table-panel"><div class="panel-head ledger-head"><div><h3>ALL HISTORY · CROSS-MODEL LEDGER</h3><p class="ledger-hint" id="history-status">Loading history…</p></div><div class="ledger-meta">NEWEST FIRST</div></div>
-    <div class="table-scroll"><table><thead><tr><th>Model / campaign</th><th>Track / rung</th><th>Experiment / evidence</th><th class="num">Result</th><th class="num">Δ prior best</th><th>Updated</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="history-rows"></tbody></table></div>
+    <div class="table-scroll"><table><colgroup><col class="campaign-col"><col class="rung-col"><col><col class="metric-col"><col class="delta-col"><col class="updated-col"><col class="review-col"><col class="status-col"><col class="open-col"></colgroup><thead><tr><th>Model / campaign</th><th>Track / rung</th><th>Experiment / evidence</th><th class="num">Result</th><th class="num">Δ prior best</th><th>Updated</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="history-rows"></tbody></table></div>
   </article><button class="pill history-more" id="history-more" hidden>Load more</button>
 </section>
 </div>
