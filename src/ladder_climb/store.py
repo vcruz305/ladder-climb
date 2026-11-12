@@ -202,9 +202,12 @@ def archive_campaign(directory: str | Path, *, model: str, campaign: str, title:
 
 def list_models(directory: str | Path) -> list[dict[str, Any]]:
     root = Path(directory).expanduser().resolve()
-    if (root / "ladder.json").is_file(): return [{"id": "legacy", "model_name": load_board(root)["model_name"], "active_campaign": "legacy"}]
     manifest = json.loads((root / "workspace.json").read_text()) if (root / "workspace.json").exists() else {"models": {}}
-    return sorted(manifest.get("models", {}).values(), key=lambda m: m["id"])
+    default_model = manifest.get("default_model")
+    models = sorted(manifest.get("models", {}).values(), key=lambda m: (m["id"] != default_model, m["id"]))
+    if models: return models
+    if (root / "ladder.json").is_file(): return [{"id": "legacy", "model_name": load_board(root)["model_name"], "active_campaign": "legacy"}]
+    return []
 
 def list_campaigns(directory: str | Path, model: str) -> list[dict[str, Any]]:
     base = resolve_board_dir(directory, model); result = [{"campaign_id": load_board(base).get("campaign_id", "active"), "active": True}]

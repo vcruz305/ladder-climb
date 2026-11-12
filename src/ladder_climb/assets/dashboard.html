@@ -10,27 +10,53 @@
 <body data-layout="unified" data-view="live">
 <a class="skip" href="#content">Skip to content</a>
 <main>
-<header class="topbar"><div><p class="eyebrow">Parallel ladder-climb / engineering telemetry</p><h1><span id="model">Ladder Climb</span> <span class="hardware">· <span id="hardware">Workspace</span></span></h1></div><div class="live" role="status"><span id="heartbeat" class="heartbeat"></span><span id="live-label">LIVE · 2S POLL</span><span>·</span><time id="updated">CONNECTING</time><span id="skew" class="skew" hidden>CLOCK SKEW</span></div></header>
-<nav class="modelbar" aria-label="Workspace models and history views"><div class="control-group model-tabs" id="model-tabs" role="tablist" aria-label="Models"></div><div class="control-spacer"></div><div class="control-group view-modes" role="tablist" aria-label="History views"><button class="seg" data-view="live" role="tab" aria-selected="true">Live Ladder</button><button class="seg" data-view="history" role="tab" aria-selected="false">Model History</button><button class="seg" data-view="global" role="tab" aria-selected="false">All History</button></div></nav>
+<header class="topbar">
+  <div><p class="eyebrow">Parallel ladder-climb / engineering telemetry</p><h1><span id="model">Ladder Climb</span> <span class="hardware">· <span id="hardware">Workspace</span></span></h1></div>
+  <div class="live" role="status"><span id="heartbeat" class="heartbeat"></span><span id="live-label">LIVE · 2S POLL</span><span>·</span><time id="updated">CONNECTING</time><span id="skew" class="skew" hidden>CLOCK SKEW</span></div>
+</header>
+<nav class="model-dock" aria-label="Workspace models and history views">
+  <div class="model-tabs" id="model-tabs" role="tablist" aria-label="Models"></div>
+  <div class="view-modes" role="tablist" aria-label="History views"><button class="seg" data-view="live" role="tab" aria-selected="true">Live Ladder</button><button class="seg" data-view="history" role="tab" aria-selected="false">Model History</button><button class="seg" data-view="global" role="tab" aria-selected="false">All History</button></div>
+</nav>
 <div id="content">
-<section id="overview" class="overview" hidden aria-label="Model overview"></section>
+<section id="overview" class="overview" hidden aria-label="Fleet model comparison"></section>
 <section id="live-view">
-<section class="worker-strip" id="workers" aria-label="Live worker status"></section>
-<nav class="controlbar" aria-label="Dashboard views and filters"><div class="control-group layout-modes"><span class="control-label">Layout</span><button class="seg" data-layout-mode="unified" aria-pressed="true">Unified</button><button class="seg" data-layout-mode="split" aria-pressed="false">Split</button><button class="seg" data-layout-mode="stacked" aria-pressed="false">Stacked</button><span id="layout-track-buttons" class="control-group"></span></div><div class="control-spacer"></div><div class="control-group track-tabs" id="track-filters"></div><div class="control-group status-filters"><span class="control-label">Show</span><button class="pill" data-status-filter="all" aria-pressed="true">All</button><button class="pill" data-status-filter="kept" aria-pressed="false">Kept Winners</button><button class="pill" data-status-filter="rejected" aria-pressed="false">Rejected</button></div></nav>
-<section class="charts" id="charts" aria-label="Rising ladder charts"></section>
-<section class="ledger" id="ledger" aria-label="Experiment ledger"></section>
+  <section class="worker-strip" id="workers" aria-label="Live worker status"></section>
+  <nav class="controlbar" aria-label="Dashboard views and filters">
+    <div class="control-group layout-modes"><span class="control-label">Layout</span><button class="seg" data-layout-mode="unified" aria-pressed="true">Unified</button><button class="seg" data-layout-mode="split" aria-pressed="false">Split</button><button class="seg" data-layout-mode="stacked" aria-pressed="false">Stacked</button><span id="layout-track-buttons" class="control-group"></span></div>
+    <div class="control-spacer"></div><div class="control-group track-tabs" id="track-filters"></div>
+    <div class="control-group status-filters"><span class="control-label">Show</span><button class="pill" data-status-filter="all" aria-pressed="true">All</button><button class="pill" data-status-filter="kept" aria-pressed="false">Kept Breakthroughs</button><button class="pill" data-status-filter="rejected" aria-pressed="false">Rejected</button></div>
+  </nav>
+  <section class="charts" id="charts" aria-label="Rising ladder charts"></section><section class="ledger" id="ledger" aria-label="Experiment ledger"></section>
 </section>
 <section id="model-history" hidden>
-<nav class="controlbar history-controls" aria-label="Model history filters"><div class="control-group"><label class="control-label" for="campaign-select">Campaign / Archive</label><select class="pill" id="campaign-select"><option value="active">Active Campaign</option></select></div><div class="control-group" id="model-track-filters"></div><div class="control-spacer"></div><div class="control-group"><span class="control-label">Review</span><button class="pill" data-review-filter="all" aria-pressed="true">All</button><button class="pill" data-review-filter="verified" aria-pressed="false">Verified</button><button class="pill" data-review-filter="flagged" aria-pressed="false">Flagged</button><button class="pill" data-review-filter="pending" aria-pressed="false">Pending</button></div><div class="control-group"><button class="pill" id="history-order" data-order="newest" aria-pressed="true">Newest First</button></div></nav>
-<div id="model-history-summary" class="sticky-summary"></div><section id="frontier-chart" class="charts history-charts" aria-label="Historical frontier charts"></section>
-<article class="panel table-panel"><div class="panel-head ledger-head"><div><h3>MODEL HISTORY · FULL CAMPAIGN RECORD</h3><p class="ledger-hint">Wave, session, gate, and review metadata · click any row</p></div><div class="ledger-meta" id="model-history-count"></div></div><div class="table-scroll"><table><thead><tr><th>Track / rung</th><th>Experiment / wave</th><th class="num">Result</th><th class="num">Δ step</th><th>Updated (PDT)</th><th>Gate</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="model-history-rows"></tbody></table></div></article>
+  <div class="campaign-strip" id="campaign-strip" aria-label="Campaigns and archives"></div>
+  <nav class="controlbar history-controls" aria-label="Model history filters">
+    <div class="control-group" id="model-track-filters"></div>
+    <div class="control-group" id="model-status-filters"><button class="pill" data-model-status="all" aria-pressed="true">All</button><button class="pill" data-model-status="kept" aria-pressed="false">Kept Breakthroughs</button><button class="pill" data-model-status="rejected" aria-pressed="false">Rejected</button></div>
+    <div class="control-group"><button class="pill" data-review-filter="all" aria-pressed="true">All Reviews</button><button class="pill" data-review-filter="verified" aria-pressed="false">Verified</button><button class="pill" data-review-filter="flagged" aria-pressed="false">Flagged</button></div>
+    <button class="pill" id="history-order" data-order="newest" aria-pressed="true">Newest First</button>
+    <input id="model-history-search" class="history-search" type="search" placeholder="Search this model…" aria-label="Search model history">
+  </nav>
+  <section id="model-history-summary" class="milestone-strip" aria-label="Campaign milestones"></section>
+  <section id="frontier-chart" class="charts history-charts" aria-label="Historical frontier charts"></section>
+  <article class="panel table-panel"><div class="panel-head ledger-head"><div><h3>MODEL HISTORY · FULL CAMPAIGN RECORD</h3><p class="ledger-hint">Wave, gate, review, and prior-best deltas · click any row</p></div><div class="ledger-meta" id="model-history-count"></div></div>
+    <div class="table-scroll"><table><thead><tr><th>Campaign / wave</th><th>Track</th><th>Rung / commit</th><th>Experiment / evidence</th><th class="num">Throughput</th><th class="num">Δ prior best</th><th>Updated (PDT)</th><th>Duration</th><th>Review / gate</th><th>Status</th><th></th></tr></thead><tbody id="model-history-rows"></tbody></table></div>
+  </article>
 </section>
 <section id="global-history" hidden>
-<nav class="controlbar history-controls" aria-label="Global history filters"><div class="control-group"><input id="history-search" class="history-search" name="search" type="search" placeholder="Search rungs, commits, metrics…" aria-label="Search history"></div><div class="control-group" id="history-model-filters"></div><div class="control-group"><select class="pill" id="history-status-filter" aria-label="Status"><option value="">Any status</option><option value="kept">Kept</option><option value="rejected">Rejected</option><option value="testing">Testing</option><option value="interrupted">Interrupted</option></select><select class="pill" id="history-review-filter" aria-label="Review"><option value="">Any review</option><option value="verified">Verified</option><option value="flagged">Flagged</option><option value="pending">Pending</option></select></div><div class="control-spacer"></div><div class="control-group"><button class="pill" id="export-json">Export JSON</button><button class="pill" id="export-csv">Export CSV</button></div></nav>
-<article class="panel table-panel"><div class="panel-head ledger-head"><div><h3>ALL HISTORY · CROSS-MODEL LEDGER</h3><p class="ledger-hint" id="history-status">Loading history…</p></div><div class="ledger-meta">NEWEST FIRST</div></div><div class="table-scroll"><table><thead><tr><th>Model / campaign</th><th>Track / rung</th><th>Experiment / evidence</th><th class="num">Result</th><th class="num">Δ step</th><th>Updated</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="history-rows"></tbody></table></div></article><button class="pill history-more" id="history-more" hidden>Load more</button>
+  <nav class="controlbar history-controls" aria-label="Global history filters">
+    <input id="history-search" class="history-search" name="search" type="search" placeholder="Search rungs, commits, metrics…" aria-label="Search history"><div class="control-group" id="history-model-filters"></div>
+    <select class="pill" id="history-status-filter" aria-label="Status"><option value="">Any status</option><option value="kept">Kept</option><option value="rejected">Rejected</option><option value="testing">Testing</option><option value="interrupted">Interrupted</option></select>
+    <select class="pill" id="history-review-filter" aria-label="Review"><option value="">Any review</option><option value="verified">Verified</option><option value="flagged">Flagged</option><option value="pending">Pending</option></select><div class="control-spacer"></div>
+    <div class="control-group"><button class="pill" id="export-json">Export JSON</button><button class="pill" id="export-csv">Export CSV</button></div>
+  </nav>
+  <article class="panel table-panel"><div class="panel-head ledger-head"><div><h3>ALL HISTORY · CROSS-MODEL LEDGER</h3><p class="ledger-hint" id="history-status">Loading history…</p></div><div class="ledger-meta">NEWEST FIRST</div></div>
+    <div class="table-scroll"><table><thead><tr><th>Model / campaign</th><th>Track / rung</th><th>Experiment / evidence</th><th class="num">Result</th><th class="num">Δ prior best</th><th>Updated</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="history-rows"></tbody></table></div>
+  </article><button class="pill history-more" id="history-more" hidden>Load more</button>
 </section>
 </div>
-<footer class="foot"><span id="totals">VERIFIED RUNGS · KEPT / TESTING / REJECTED</span><span>RELATIVE FEED /ladder.json · PDT = UTC−7</span></footer>
+<footer class="foot"><span id="totals">VERIFIED RUNGS · KEPT / TESTING / REJECTED</span><span>MULTI-MODEL WORKSPACE · PDT = UTC−7</span></footer>
 </main>
 <noscript>JavaScript is required. Raw feeds remain at <a href="/ladder.json">/ladder.json</a>.</noscript>
 <script src="/assets/charts.js"></script><script src="/assets/history.js"></script><script src="/assets/dashboard.js"></script>

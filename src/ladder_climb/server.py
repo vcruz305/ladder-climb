@@ -25,7 +25,9 @@ def _card(root: Path, model: dict) -> dict:
         best, winner = champion(track); baseline = track.get("baseline")
         champions[key] = {"value": best, "unit": track["unit"], "rung_id": winner["id"] if winner else None,
             "gain": best / baseline if best is not None and baseline not in (None, 0) else None}
-    return dict(model, title=board["title"], updated_at=board["updated_at"], revision=board.get("revision", 0),
+    return dict(model, title=board["title"], hardware=board.get("hardware") or model.get("hardware", ""),
+        updated_at=board["updated_at"], revision=board.get("revision", 0),
+        rungs=sum(len(t["rungs"]) for t in board["tracks"].values()),
         testing=sum(r["status"] == "testing" for t in board["tracks"].values() for r in t["rungs"]), champions=champions,
         campaigns=list_campaigns(root, model["id"]) if model["id"] != "legacy" else [])
 class Handler(BaseHTTPRequestHandler):

@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'src'))
 from ladder_climb.history import export_history, history_payload
 from ladder_climb.schema import ValidationError, load_board
 from ladder_climb.server import make_server
-from ladder_climb.store import archive_campaign, board_lock, claim_rung, initialize, paths_for, review_rung, upsert_rung
+from ladder_climb.store import archive_campaign, board_lock, claim_rung, initialize, list_models, paths_for, review_rung, upsert_rung
 TRACK={'id':'speed','label':'Speed','unit':'tok/s','baseline':100,'target':500,'direction':'higher'}
 def make(root:Path,model='alpha'):
  return initialize(root,model.title(),'workspace test',[TRACK],model=model,model_name=model.title(),hardware='test')
@@ -66,4 +66,9 @@ class CompatibilityTests(unittest.TestCase):
     except ValidationError as exc:errors.append(str(exc))
    threads=[threading.Thread(target=init) for _ in range(2)];[t.start() for t in threads];[t.join() for t in threads]
    self.assertEqual(len(errors),1);self.assertEqual(load_board(d)['title'],'Race')
+ def test_workspace_manifest_precedes_preserved_legacy_feed(self):
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);initialize(root,'Legacy','compatibility',[TRACK]);make(root);make(root,'beta')
+   self.assertEqual([m['id'] for m in list_models(root)],['alpha','beta'])
+   self.assertEqual(load_board(root)['title'],'Legacy')
 if __name__=='__main__':unittest.main()
