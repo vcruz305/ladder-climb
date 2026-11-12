@@ -72,6 +72,14 @@ ladder export --dir BOARD --format csv --output history.csv
 
 Use `--start-next` only when intentionally starting an empty successor campaign. Never mutate archived `ladder.json` files. Global history supports search, model/campaign/track/status/gate/review/session/wave filters, chronological replay, pagination, and JSON/CSV export.
 
+### Dashboard and archive-overlay workflow
+
+- Open `/?view=overview` or click **Fleet (N)** for the side-by-side model matrix. Read each model card's live mini worker strips and stepped-frontier sparklines; do not compare champions as global winners when units or regimes differ. Select a card to enter its live ladder.
+- The two-line `.model-dock` tabs remain visible while inspecting another view. Their beacons show live/testing status; their second lines report inline per-track champion values/units and total rung count. Recheck sibling beacons before declaring a workspace idle.
+- Open `/?model=MODEL_ID&view=history` for **Model History**. Campaign/wave cards select Active Climb or immutable archives, and the four-cell milestone strip summarizes baseline-to-best progress, kept/explored hit rate, climb time, and review/gate/archive totals.
+- On Active Climb, click **Overlay Archives** to compare the live frontier with every archived campaign as dashed ghost frontiers. The UI lists archives through `/api/models/MODEL_ID/campaigns` and retrieves each through `/api/models/MODEL_ID/ladder.json?campaign=ARCHIVE_ID`; archives must remain immutable. Use `&campaign=ARCHIVE_ID` for a direct archive link.
+- Open `/?view=global` for **All History**. Apply search plus model/status/review filters before exporting. JSON/CSV exports contain the full filtered result set rather than only rows loaded in the browser, and CSV output neutralizes spreadsheet formula prefixes.
+
 ## Safety invariants
 
 - Never edit `ladder.json` directly; use locked store/CLI mutations and atomic replacement.

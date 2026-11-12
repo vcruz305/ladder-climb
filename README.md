@@ -2,7 +2,7 @@
 
 **An agent-first live ladder-climb leaderboard and atomic multi-agent benchmark harness.**
 
-Ladder Climb v0.2 records independent optimization campaigns for multiple models, with live telemetry, immutable campaign archives, adversarial review verdicts, and searchable cross-model history. The CLI and HTTP server use only the Python standard library; the dashboard is plain HTML, CSS, JavaScript, and SVG.
+Ladder Climb v0.2.1 records independent optimization campaigns for multiple models, with live telemetry, immutable campaign archives, adversarial review verdicts, and searchable cross-model history. The CLI and HTTP server use only the Python standard library; the dashboard is plain HTML, CSS, JavaScript, and SVG.
 
 - **Independent model locks** — each model has its own read-modify-write lock and atomic JSON feed.
 - **Legacy compatible** — an existing `DIR/ladder.json` remains a single-board workspace; v1 `rung`/`notes` and metric aliases load transparently.
@@ -70,6 +70,15 @@ ladder campaigns list --dir ./workspace --model atlas --json
 ```
 
 All mutation commands accept a bounded `--lock-timeout` (10 seconds by default). Model locks are independent, so simultaneous model writers do not serialize against one another.
+
+## Dashboard workflows
+
+The dock and all history views are served from the same local dashboard; use these URLs directly or click the corresponding tabs:
+
+- **Two-line model dock** — every `.model-dock` model tab keeps a live status beacon and testing indicator on its first line, plus inline per-track champion values/units and the model's rung count on its second line. Switching into Fleet or a history view does not hide sibling climbs, so live status remains visible across the workspace.
+- **Fleet matrix** (`/?view=overview`) — the `Fleet (N)` tab lays models out side by side. Each card includes live mini worker strips and stepped-frontier sparklines for every track, with current champion/gain labels and archive/rung metadata. Select a card to open that model's live ladder.
+- **Model History** (`/?model=MODEL_ID&view=history`) — browse clickable Active Climb and immutable campaign/wave archive cards, search and filter the selected campaign, and inspect the four-cell milestone summary (baseline-to-best, kept/explored hit rate, total climb time, and review/gate/archive totals). On the Active Climb, **Overlay Archives** loads every archived feed and draws each archive frontier as a dashed ghost line behind the live frontier for direct campaign comparison. Add `&campaign=ARCHIVE_ID` to link directly to one archive.
+- **All History** (`/?view=global`) — search across rungs, commits, and metrics, then filter by model, status, and review verdict. Results support stable incremental loading and expandable metadata rows. **Export JSON** and **Export CSV** preserve the active server-side filters and export the full result set, not only loaded rows; CSV cells are neutralized against spreadsheet formula execution.
 
 ## History and export
 
